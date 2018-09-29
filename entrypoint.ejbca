@@ -1,0 +1,96 @@
+#!/bin/bash
+
+set -e
+
+source /root/jboss_password
+
+function jbossCli()
+{
+	#$JBOSS_HOME/bin/jboss-cli.sh --connect --user=admin --password=$JBOSS_PASSWORD $@
+	$JBOSS_HOME/bin/jboss-cli.sh --connect $@
+}
+
+function waitForJBoss()
+{
+	while ! timeout 1 bash -c 'cat < /dev/null > /dev/tcp/localhost/9999' 2>/dev/null ; do
+		log "Waiting for jboss (port) ..."
+		sleep 3
+	done
+
+	while ! jbossCli --commands=':read-attribute(name=server-state)' | grep --quiet running ; do
+		log "Waiting for jboss (server) ..."
+		sleep 3
+	done
+}
+
+ant_log=/var/log/entrypoint.ejbca.ant.log
+jboss_log=/var/log/entrypoint.ejbca.jboss.log
+
+# Configure: ejbca
+if [[ ! -e $EP_RUN ]] ; then
+	log "Configuring $(basename $0) for first run ..."
+
+	# Bug Fix: https://jira.primekey.se/browse/COMMUNITY-126
+	export EP_PWGEN_LENGTH=54
+
+	# Generate passwords ...
+	for i in admin database keystore truststore ; do
+		generate_password ejbca_$i
+	done
+
+	# Volume initialization
+	log "Initializing data volume ..."
+	mkdir --parents $EJBCA_DATA/p12
+	if [[ ! -d $EJBCA_DATA/conf ]] ; then
+		export ant_install_needed=1
+		mv $EJBCA_HOME/conf $EJBCA_DATA
+	fi
+	rm --force --recursive $EJBCA_HOME/conf
+	for i in conf p12 ; do
+		ln --symbolic $EJBCA_DATA/$i $EJBCA_HOME/$i
+	done
+
+	# database.properties
+	if [[ ! -f $EJBCA_DATA/conf/database.properties ]] ; then
+		install --group=jboss --mode=0600 --owner=jboss /dev/null $EJBCA_DATA/conf/database.properties
+		render_template /usr/local/share/ejbca/database.properties.${EJBCA_DATASOURCE:-h2} $EJBCA_DATA/conf/database.properties
+	fi
+
+	# *.properties ...
+	for i in install web ; do
+		if [[ ! -f $EJBCA_DATA/conf/$i.properties ]] ; then
+			install --group=jboss --mode=0600 --owner=jboss /dev/null $EJBCA_DATA/conf/$i.properties
+			render_template /usr/local/share/ejbca/$i.properties $EJBCA_DATA/conf/$i.properties
+		fi
+	done
+
+	log "Applying ownership and permissions ..."
+	find $EJBCA_DATA \( \! -user jboss -o \! -group jboss \) -exec chown jboss:jboss {} \;
+	for i in $ant_log $jboss_log ; do
+		install --group=jboss --mode=0640 --owner=jboss /dev/null $i
+	done
+
+	# Start jboss ...
+	log "Starting jboss ..."
+	su --command="$JBOSS_HOME/bin/standalone.sh -Djboss.bind.address=0.0.0.0 -Djboss.bind.adress.management=0.0.0.0 2>&1" --login --preserve-environment jboss > $jboss_log &
+	waitForJBoss
+
+	# Deploy ejbca ...
+	log "Deploying ejbca ..."
+	targets=(deploy)
+	if [[ -z $ant_install_needed ]] ; then
+		log "	Using existing data"
+		# https://www.ejbca.org/docs/Backup_and_Restore.html
+		# https://www.ejbca.org/docs/Deployment_Reference.html
+		targets+=(deploy-keystore web-configure)
+	else
+		targets+=(install)
+	fi
+	targets+=(clean)
+	su --command="cd $EJBCA_HOME && ant -buildfile $EJBCA_HOME -logfile $ant_log -quiet $(echo ${targets[@]})" --login jboss
+
+	# Stop jboss ...
+	log "Stopping jboss ..."
+	jbossCli --commands=":shutdown"
+fi
+

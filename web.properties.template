@@ -1,0 +1,8 @@
+httpsserver.dn=${EJBCA_SERVER_DN}
+httpsserver.hostname=${EJBCA_SERVER_NAME}
+httpsserver.password=${EJBCA_KEYSTORE_PASSWORD}
+java.trustpassword=${EJBCA_TRUSTSTORE_PASSWORD}
+superadmin.batch=${EJBCA_SUPERADMIN_KEYSTORE_BATCHED}
+superadmin.cn=${EJBCA_SUPERADMIN_CN}
+superadmin.dn=${EJBCA_SUPERADMIN_DN}
+superadmin.password=${EJBCA_ADMIN_PASSWORD}

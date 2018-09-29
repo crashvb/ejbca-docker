@@ -1,0 +1,5 @@
+                    <driver name="com.mysql.jdbc.Driver" module="com.mysql">
+                        <!-- https://issues.jboss.org/browse/WFLY-3218 -->
+                        <driver-class>com.mysql.jdbc.Driver</driver-class>
+                        <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
+                    </driver>

@@ -1,0 +1,2 @@
+database.username=${EJBCA_DATABASE_USERNAME}
+database.password=${EJBCA_DATABASE_PASSWORD}
