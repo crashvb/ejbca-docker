@@ -101,8 +101,9 @@ The embedded entrypoint script is located at `/etc/entrypoint.d/20ejbca` and per
 
 ### Exposed Ports
 
-* `8442/tcp` - SSL-encrypted connection between deployed web applications and clients.
-* `8443/tcp` - (_repurposed_) SSL-encrypted port used to access the EJBCA admin GUI.
+* `8080/tcp` - (_repurposed_) Public HTTP port of your application server, used for clients to access the public web for information. Not to be used for enrollment since it's not encrypted.
+* `8442/tcp` - Public HTTPS port (server side only SSL) of your application server, used for clients to access the public web for enrollment.
+* `8443/tcp` - SSL protected HTTPS port used to access the EJBCA Admin GUI. This port requires client certificate for access.
 
 ### Volumes
 

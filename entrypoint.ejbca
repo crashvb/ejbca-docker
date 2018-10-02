@@ -2,8 +2,6 @@
 
 set -e
 
-source /root/jboss_password
-
 function jbossCli()
 {
 	#$JBOSS_HOME/bin/jboss-cli.sh --connect --user=admin --password=$JBOSS_PASSWORD $@
@@ -32,6 +30,9 @@ if [[ ! -e $EP_RUN ]] ; then
 
 	# Bug Fix: https://jira.primekey.se/browse/COMMUNITY-126
 	export EP_PWGEN_LENGTH=54
+
+	# Source / generate jboss password
+	generate_password jboss
 
 	# Generate passwords ...
 	for i in admin database keystore truststore ; do
