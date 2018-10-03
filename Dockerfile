@@ -1,5 +1,5 @@
 FROM crashvb/jboss:ubuntu
-MAINTAINER Richard Davis <crashvb@gmail.com>
+LABEL maintainer "Richard Davis <crashvb@gmail.com>"
 
 # Install packages, download files ...
 ENV EJBCA_DATA=/var/lib/ejbca EJBCA_HOME=/usr/share/ejbca EJBCA_VERSION=6_10_1_2
