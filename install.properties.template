@@ -1,8 +1,0 @@
-ca.dn=${EJBCA_CA_DN}
-ca.keyspec=${EJBCA_CA_KEY_SPEC}
-ca.keytype=${EJBCA_CA_KEY_TYPE}
-ca.name=${EJBCA_CA_NAME}
-ca.policy=${EJBCA_CA_POLICY_ID}
-ca.signaturealgorithm=${EJBCA_CA_SIGNATURE_ALGORITHM}
-ca.tokenpassword=${EJBCA_CA_TOKEN_PASSWORD}
-ca.validity=${EJBCA_CA_VALIDITY_DAYS}

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+
+/sbin/docker-yum-install $@
+/sbin/docker-yum-clean

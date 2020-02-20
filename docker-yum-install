@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+yum repolist all
+if [[ -n "$YUM_ALL_REPOS" ]] ; then
+	yum --setopt=tsflags=nodocs install --assumeyes epel-release
+
+	egrep "^\[" /etc/yum.repos.d/*.repo | tr --delete '[]' | xargs yum-config-manager --enable
+fi
+
+yum --setopt=tsflags=nodocs install --assumeyes $@

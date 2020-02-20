@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+source /usr/local/lib/entrypoint.sh
+
+secrets=$EP_SECRETS_ROOT/ejbca_admin_password
+if [[ -e $secrets ]] ; then
+	generate_password ejbca_admin
+else
+	read -p "ejbca admin password not found, please provide:" -s EJBCA_ADMIN_PASSWORD
+	echo ""
+fi
+
+if [[ -z $EJBCA_ADMIN_PASSWORD ]] ; then
+	echo "Unable to retrieve ejbca admin password!"
+	exit 1
+fi
+
+su --command="cd $EJBCA_DATA && $EJBCA_HOME/bin/ejbca.sh ra setendentitystatus superadmin 10" --login ejbca
+su --command="cd $EJBCA_DATA && $EJBCA_HOME/bin/ejbca.sh ra setclearpwd superadmin $EJBCA_ADMIN_PASSWORD" --login ejbca
+su --command="cd $EJBCA_DATA && $EJBCA_HOME/bin/ejbca.sh batch" --login ejbca
+
+ls -l $EJBCA_DATA/p12/superadmin.p12
+

@@ -3,29 +3,33 @@
 include makefile.config
 -include makefile.config.local
 
-.PHONY: build debug default diff get-cert logs remove run shell start status stop
+.PHONY: build clean debug default diff get-cert logs remove run shell start status stop
 
 default: build
 
 build:
-	docker build --force-rm=true --tag=$(registry)/$(image):$(tag) $(ARGS) .
+	docker build --force-rm=true --tag=$(registry)$(namespace)/$(image):$(tag) $(buildargs) $(ARGS) .
 
 clean:
 	rm --force ./superadmin.p12
+
 debug:
 	docker run \
 		--detach=true \
+		--hostname=$(name)-db \
 		--name=$(name)-db \
 		--tty=true \
 		$(dbrunargs) \
-		$(registry)/mysql:ubuntu \
+		$(registry)$(namespace)/mysql:$(dbtag) \
 		$(ARGS)
 	docker run \
+		--hostname=$(name) \
+		--interactive=true \
 		--link=$(name)-db:ejbca-db \
 		--name=$(name) \
 		--tty=true \
 		$(runargs) \
-		$(registry)/$(image):$(tag) \
+		$(registry)$(namespace)/$(image):$(tag) \
 		$(ARGS)
 
 diff:
@@ -44,18 +48,20 @@ remove:
 run:
 	docker run \
 		--detach=true \
+		--hostname=$(name)-db \
 		--name=$(name)-db \
 		--tty=true \
 		$(dbrunargs) \
-		$(registry)/mysql:ubuntu \
+		$(registry)$(namespace)/mysql:$(dbtag) \
 		$(ARGS)
 	docker run \
 		--detach=true \
+		--hostname=$(name) \
 		--link=$(name)-db:ejbca-db \
 		--name=$(name) \
 		--tty=true \
 		$(runargs) \
-		$(registry)/$(image):$(tag) \
+		$(registry)$(namespace)/$(image):$(tag) \
 		$(ARGS)
 
 shell:
