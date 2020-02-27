@@ -27,6 +27,8 @@ RUN mkdir --parents ${EJBCA_DATA} && \
 	rm --force /tmp/ZuluJCEPolicies.zip
 
 # Configure: ejbca
+ENV EP_USER=ejbca
+RUN useradd --gid=0 --groups=tty --home=/opt --comment="ejbca user" --uid=10001 ejbca
 ADD ejbca-renew-* /usr/local/bin/
 
 ENTRYPOINT ["/sbin/entrypoint"]

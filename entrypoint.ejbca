@@ -22,6 +22,9 @@ if [[ ! -e $EP_RUN ]] ; then
 	mkdir --parents $EJBCA_DATA/p12
 	ln --symbolic $EJBCA_DATA/p12 $EJBCA_HOME/p12
 
+	log "Applying ownership and permissions ..."
+	find $EJBCA_DATA \( \! -user ejbca -o \! -group root \) -exec chown ejbca:root {} \;
+
 	# Assign database password
 	log "Assigning database password..."
 	export DATABASE_PASSWORD="$EJBCA_DATABASE_PASSWORD"

@@ -16,7 +16,7 @@ echo "Container initialized on $(date +%Y-%m-%d_%H:%M:%S) by PID $BASHPID" > $EP
 
 if [[ -n $EP_USER ]]  && [[ $EP_USER != "root" ]] ; then
 	log "User: $EP_USER"
-	set -- su --login "$EP_USER" --command='"$0" "$@"' -- "$@"
+	set -- su --preserve-environment --command='"$0" "$@"' "$EP_USER" -- "$@"
 fi
 
 log "Launching:" $@ "..."

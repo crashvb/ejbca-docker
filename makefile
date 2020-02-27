@@ -36,7 +36,7 @@ diff:
 	docker diff $(name)
 
 get-cert:
-	docker cp $(name):/var/lib/ejbca/p12/superadmin.p12 ./
+	docker cp $(name):/mnt/persistent/p12/superadmin.p12 ./
 	docker exec $(name) cat /run/secrets/ejbca_admin_password
 
 logs:
@@ -68,7 +68,7 @@ shell:
 	docker exec --interactive=true --tty=true $(name) /bin/login -f root -p $(ARGS)
 
 start:
-	docker start $(ARGS) $(name)
+	docker start $(ARGS) $(name)-db $(name)
 
 status:
 	docker ps $(ARGS) --all=true --filter=name=$(name)
