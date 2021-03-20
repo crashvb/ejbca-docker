@@ -30,8 +30,8 @@ keytool -importcert -noprompt -alias trusted-ca -file $tmp -keystore $truststore
 rm $tmp
 
 chown jboss:jboss $truststore
-cp $truststore $JBOSS_HOME/standalone/configuration/keystore/truststore.jks
-ls -l $truststore $JBOSS_HOME/standalone/configuration/keystore/truststore.jks
+install --group root --mode 0644 --owner ejbca $truststore $JBOSS_HOME/standalone/configuration/truststore.jks
+ls -l $truststore $JBOSS_HOME/standalone/configuration/truststore.jks
 
 echo "*** JBoss must be restared to apply the changes! ***"
 
