@@ -2,7 +2,7 @@
 
 set -e
 
-yum clean all
+microdnf clean all
 rm --force --recursive \
 	/tmp/* \
 	/var/cache/yum/* \

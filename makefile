@@ -69,7 +69,7 @@ run:
 		$(ARGS)
 
 shell:
-	docker exec --interactive=true --tty=true $(name) /bin/login -f root -p $(ARGS)
+	docker exec --interactive=true --tty=true --user=root $(name) /bin/bash $(ARGS)
 
 start:
 	docker start $(ARGS) $(name)-db $(name)
