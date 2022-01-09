@@ -1,13 +1,14 @@
 #!/bin/bash
 
-export EP_GPG_KEY_LENGTH=${EP_GPG_KEY_LENGTH:-4096}
+export EP_GPG_KEY_LENGTH=${EP_GPG_KEY_LENGTH:-8192}
 export EP_PWGEN_LENGTH=${EP_PWGEN_LENGTH:-64}
 export EP_RUN=/var/local/container_initialized
 export EP_SECRETS_ROOT=${EP_SECRETS_ROOT:-/run/secrets}
+export EP_SSH_KEY_LENGTH=${EP_GPG_KEY_LENGTH:-8192}
 
 function log
 {
-	echo "$(date +%Y-%m-%d_%H:%M:%S) | $(basename $0) | $@"
+	echo -e "$(date +%Y-%m-%d_%H:%M:%S) | $(basename $0) | $@"
 }
 export -f log
 
@@ -65,7 +66,7 @@ function generate_password
 
 	if [[ -e $secrets ]] ; then
 		log "Importing $var from secrets ..."
-		export $var=$(<$secrets)
+		export $var="$(<$secrets)"
 	elif [[ -z "$(eval echo \$$var)" ]] ; then
 		log "Generating $var in secrets ..."
 		export $var=$(pwgen --capitalize --numerals --secure -1 $EP_PWGEN_LENGTH)
@@ -90,14 +91,14 @@ function generate_sshkey
 		mkdir --parents $EP_SECRETS_ROOT
 	fi
 
-	mkdir --parents $(basename $userkey)
+	mkdir --parents $(dirname $userkey)
 
 	if [[ -e $secrets ]] ; then
 		log "Importing $key from secrets ..."
 		ln --force --symbolic $secrets $userkey
 	elif [[ ! -e $userkey  ]] ; then
 		log "Generating $key in secrets ..."
-		ssh-keygen -f $secrets -t rsa -N ''
+		ssh-keygen -b $EP_SSH_KEY_LENGTH -f $secrets -t rsa -N ''
 		ln --symbolic $secrets $userkey
 	else
 		log "Importing $key from container ..."
@@ -117,7 +118,7 @@ function render_template
 		while IFS='=' read -r key value
 		do
 			eval "export $key=\${$key:=$value}"
-			log "	$key=$(eval echo \$$key)"
+			log "	$key=${!key}"
 		done < "$1.defaults"
 	fi
 

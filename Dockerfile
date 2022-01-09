@@ -1,6 +1,17 @@
-# primekey/ejbca-ce:7.4.3.2
-FROM primekey/ejbca-ce@sha256:a8046dd8d6ebb7602bf3b0a564c0d5dded303d84268f1400354a44f1d0669faa
-LABEL maintainer "Richard Davis <crashvb@gmail.com>"
+FROM primekey/ejbca-ce:7.4.3.2@sha256:a8046dd8d6ebb7602bf3b0a564c0d5dded303d84268f1400354a44f1d0669faa
+ARG org_opencontainers_image_created=undefined
+ARG org_opencontainers_image_revision=undefined
+LABEL \
+	org.opencontainers.image.authors="Richard Davis <crashvb@gmail.com>" \
+	org.opencontainers.image.base.digest="sha256:a8046dd8d6ebb7602bf3b0a564c0d5dded303d84268f1400354a44f1d0669faa" \
+	org.opencontainers.image.base.name="primekey/ejbca-ce:7.4.3.2" \
+	org.opencontainers.image.created="${org_opencontainers_image_created}" \
+	org.opencontainers.image.description="Image containing EJBCA." \
+	org.opencontainers.image.licenses="Apache-2.0" \
+	org.opencontainers.image.source="https://github.com/crashvb/ejbca-docker" \
+	org.opencontainers.image.revision="${org_opencontainers_image_revision}" \
+	org.opencontainers.image.title="crashvb/ejbca" \
+	org.opencontainers.image.url="https://github.com/crashvb/ejbca-docker"
 
 USER root
 
