@@ -1,5 +1,10 @@
 # ejbca-docker
 
+[![version)](https://img.shields.io/docker/v/crashvb/ejbca/latest)](https://hub.docker.com/repository/docker/crashvb/ejbca)
+[![image size](https://img.shields.io/docker/image-size/crashvb/ejbca/latest)](https://hub.docker.com/repository/docker/crashvb/ejbca)
+[![linting](https://img.shields.io/badge/linting-hadolint-yellow)](https://github.com/hadolint/hadolint)
+[![license](https://img.shields.io/github/license/crashvb/ejbca-docker.svg)](https://github.com/crashvb/ejbca-docker/blob/master/LICENSE.md)
+
 ## Overview
 
 This docker image contains [EJBCA](https://ejbca.org/).
@@ -51,28 +56,28 @@ The embedded entrypoint script is located at `/etc/entrypoint.d/20ejbca` and per
 
  | Variable | Default Value | Description |
  | ---------| ------------- | ----------- |
- | EJBCA_ADMIN_PASSWORD | _random_ | The ejbca `admin` password. |
- | EJBCA_CA_NAME | ManagementCA | The name of the CA. |
- | EJBCA_CA_DN | CN=$EJBCA_CA_NAME,O=EJBCA Sample,C=SE | The distinguished name of the CA. |
- | EJBCA_CA_KEY_SPEC | 4096 | The cryptographic key length. |
- | EJBCA_CA_KEY_TYPE | RSA | The cryptography algorithm. |
- | EJBCA_CA_POLICY_ID | null |  |
- | EJBCA_CA_SIGNATURE_ALGORITHM | SHA256WithRSA | The signature algorithm. |
- | EJBCA_CA_TOKEN_PASSWORD | null |  |
- | EJBCA_CA_VALIDITY_DAYS | 30 | The time, in days, for which the CA is valid. |
- | EJBCA_DATABASE_HOST | ejbca-db | The ejbca database hostname. (mysql only) |
- | EJBCA_DATABASE_NAME | ejbca | The ejbca database name. (mysql only) |
- | EJBCA_DATABASE_PASSWORD | _random_ | The ejbca `database` password. |
- | EJBCA_DATABASE_PORT | 3306 | The ejbca database port. (mysql only) |
- | EJBCA_DATABASE_USERNAME | ejbca | The ejbca database username. (mysql only) |
- | EJBCA_DATASOURCE | h2 | The datasource type (h2, postgres, mariadb, etc ...) |
- | EJBCA_KEYSTORE_PASSWORD | _random_ | The ejbca `keystore` password. |
- | EJBCA_SERVER_NAME | localhost | The name of the server. |
- | EJBCA_SERVER_DN | CN=$EJBCA_SERVER_NAME,O=EJBCA Sample,C=SE | The distinguished name of the server. |
- | EJBCA_SUPERADMIN_CN | SuperAdmin | The common name of the administrator. |
- | EJBCA_SUPERADMIN_DN | CN=$EJBCA_SUPERADMIN_CN | The distinguised name of the administrator.  |
- | EJBCA_SUPERADMIN_KEYSTORE_BATCHED | true |  |
- | EJBCA_TRUSTSTORE_PASSWORD | _random_ | The ejbca `truststore` password. |
+ | EJBCA\_ADMIN\_PASSWORD | _random_ | The ejbca `admin` password. |
+ | EJBCA\_CA\_NAME | ManagementCA | The name of the CA. |
+ | EJBCA\_CA\_DN | CN=$EJBCA\_CA\_NAME,O=EJBCA Sample,C=SE | The distinguished name of the CA. |
+ | EJBCA\_CA\_KEY\_SPEC | 4096 | The cryptographic key length. |
+ | EJBCA\_CA\_KEY\_TYPE | RSA | The cryptography algorithm. |
+ | EJBCA\_CA\_POLICY\_ID | null |  |
+ | EJBCA\_CA\_SIGNATURE\_ALGORITHM | SHA256WithRSA | The signature algorithm. |
+ | EJBCA\_CA\_TOKEN\_PASSWORD | null |  |
+ | EJBCA\_CA\_VALIDITY\_DAYS | 30 | The time, in days, for which the CA is valid. |
+ | EJBCA\_DATABASE\_HOST | ejbca-db | The ejbca database hostname. (mysql only) |
+ | EJBCA\_DATABASE\_NAME | ejbca | The ejbca database name. (mysql only) |
+ | EJBCA\_DATABASE\_PASSWORD | _random_ | The ejbca `database` password. |
+ | EJBCA\_DATABASE\_PORT | 3306 | The ejbca database port. (mysql only) |
+ | EJBCA\_DATABASE\_USERNAME | ejbca | The ejbca database username. (mysql only) |
+ | EJBCA\_DATASOURCE | h2 | The datasource type (h2, postgres, mariadb, etc ...) |
+ | EJBCA\_KEYSTORE\_PASSWORD | _random_ | The ejbca `keystore` password. |
+ | EJBCA\_SERVER\_NAME | localhost | The name of the server. |
+ | EJBCA\_SERVER\_DN | CN=$EJBCA\_SERVER\_NAME,O=EJBCA Sample,C=SE | The distinguished name of the server. |
+ | EJBCA\_SUPERADMIN\_CN | SuperAdmin | The common name of the administrator. |
+ | EJBCA\_SUPERADMIN\_DN | CN=$EJBCA\_SUPERADMIN\_CN | The distinguised name of the administrator.  |
+ | EJBCA\_SUPERADMIN\_KEYSTORE\_BATCHED | true |  |
+ | EJBCA\_TRUSTSTORE\_PASSWORD | _random_ | The ejbca `truststore` password. |
 
 ## Standard Configuration
 

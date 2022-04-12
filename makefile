@@ -3,15 +3,15 @@
 include makefile.config
 -include makefile.config.local
 
-.PHONY: admin-web build clean debug default diff get-cert logs remove run shell start status stop
+.PHONY: admin-web build clean debug default diff get-cert logs remove run shell start status stop test-code
 
 default: build
 
-build:
+build: Dockerfile
 	docker build --force-rm=true --tag=$(registry)$(namespace)/$(image):$(tag) $(buildargs) $(ARGS) .
 
 clean:
-	rm --force ./superadmin.p12
+	@rm --force ./superadmin.p12
 
 admin-web:
 	$(eval port := $(shell docker inspect --format='{{(index (index .NetworkSettings.Ports "8443/tcp") 0).HostPort}}' $(name)))
@@ -37,17 +37,17 @@ debug:
 		$(ARGS)
 
 diff:
-	docker diff $(name)
+	@docker diff $(name)
 
 get-cert:
 	docker cp $(name):/mnt/persistent/p12/superadmin.p12 ./
 	docker exec $(name) cat /run/secrets/ejbca_admin_password
 
 logs:
-	docker logs --follow=true $(ARGS) $(name)
+	@docker logs --follow=true $(ARGS) $(name)
 
 remove:
-	docker rm --volumes=true $(ARGS) $(name) $(name)-db
+	-@docker rm --force=true --volumes=true $(ARGS) $(name) $(name)-db
 
 run:
 	docker run \
@@ -69,14 +69,24 @@ run:
 		$(ARGS)
 
 shell:
-	docker exec --interactive=true --tty=true --user=root $(name) /bin/bash $(ARGS)
+	@docker exec --interactive=true --tty=true --user=root $(name) /bin/bash $(ARGS)
 
 start:
 	docker start $(ARGS) $(name)-db $(name)
 
 status:
-	docker ps $(ARGS) --all=true --filter=name=$(name)
+	@docker ps $(ARGS) --all=true --filter=name=$(name)
 
 stop:
-	docker stop $(ARGS) $(name) $(name)-db
+	-@docker stop $(ARGS) $(name) $(name)-db
+
+test-code: Dockerfile
+	@docker run \
+		--interactive=true \
+		--rm=true \
+		hadolint/hadolint:latest-debian \
+		hadolint \
+		$(ARGS) \
+		- \
+		< Dockerfile
 
