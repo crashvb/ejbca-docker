@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -e
+set -e -o pipefail
 
 microdnf repolist
-if [[ -n "$YUM_ALL_REPOS" ]] ; then
+if [[ -n "${YUM_ALL_REPOS}" ]] ; then
 	microdnf --setopt=tsflags=nodocs install --assumeyes epel-release
 
-	egrep "^\[" /etc/yum.repos.d/*.repo | tr --delete '[]' | xargs yum-config-manager --enable
+	grep -E "^\[" /etc/yum.repos.d/*.repo | tr --delete '[]' | xargs yum-config-manager --enable
 fi
 
-microdnf --setopt=tsflags=nodocs install --assumeyes $@
+microdnf --setopt=tsflags=nodocs install --assumeyes "$@"

@@ -1,3 +1,5 @@
+FROM crashvb/base:22.04-202302172125@sha256:502350d90a33aea5fe94f0c43ff1d17a1f581d75abba3addcdc7dfa735e8c870 as parent
+
 FROM primekey/ejbca-ce:7.4.3.2@sha256:a8046dd8d6ebb7602bf3b0a564c0d5dded303d84268f1400354a44f1d0669faa
 ARG org_opencontainers_image_created=undefined
 ARG org_opencontainers_image_revision=undefined
@@ -17,8 +19,9 @@ LABEL \
 USER root
 
 # Install packages, download files ...
-COPY docker-* entrypoint healthcheck /sbin/
-COPY entrypoint.sh /usr/local/lib/
+COPY --from=parent /sbin/entrypoint /sbin/healthcheck /sbin/
+COPY --from=parent /usr/local/lib/entrypoint.sh /usr/local/lib/
+COPY docker-* /sbin/
 RUN docker-microdnf shadow-utils unzip util-linux wget
 
 # Configure: bash profile

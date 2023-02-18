@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -e
+set -e -o pipefail
 
 # Configure: ejbca
-if [[ ! -e $EP_RUN ]] ; then
-	log "Configuring $(basename $0) for first run ..."
+if [[ ! -e "${EP_RUN}" ]] ; then
+	log "Configuring $(basename "${0}") for first run ..."
 
 	# Bug Fix: https://jira.primekey.se/browse/COMMUNITY-126
 	export EP_PWGEN_LENGTH=54
@@ -14,19 +14,19 @@ if [[ ! -e $EP_RUN ]] ; then
 
 	# Generate passwords ...
 	for i in admin database keystore truststore ; do
-		generate_password ejbca_$i
+		generate_password "ejbca_${i}"
 	done
 
 	# Volume initialization
 	log "Initializing data volume ..."
-	mkdir --parents $EJBCA_DATA/p12
-	ln --symbolic $EJBCA_DATA/p12 $EJBCA_HOME/p12
+	mkdir --parents "${EJBCA_DATA}/p12"
+	ln --symbolic "${EJBCA_DATA}/p12" "${EJBCA_HOME}/p12"
 
 	log "Applying ownership and permissions ..."
-	find $EJBCA_DATA \( \! -user ejbca -o \! -group root \) -exec chown ejbca:root {} \;
+	find "${EJBCA_DATA}" \( \! -user ejbca -o \! -group root \) -exec chown ejbca:root {} \;
 
 	# Assign database password
 	log "Assigning database password..."
-	export DATABASE_PASSWORD="$EJBCA_DATABASE_PASSWORD"
+	export DATABASE_PASSWORD="${EJBCA_DATABASE_PASSWORD}"
 fi
 
