@@ -87,7 +87,7 @@ The embedded entrypoint script is located at `/etc/entrypoint.d/20ejbca` and per
 /
 ├─ etc/
 │  └─ entrypoint.d/
-│     └─ 20ejbca
+│     └─ ejbca
 ├─ run/
 │  └─ secrets/
 │     ├─ ejbca_admin_password
