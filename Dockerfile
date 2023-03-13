@@ -21,7 +21,7 @@ USER root
 # Install packages, download files ...
 COPY --from=parent /sbin/entrypoint /sbin/healthcheck /sbin/
 COPY --from=parent /usr/local/lib/entrypoint.sh /usr/local/lib/
-COPY docker-* /sbin/
+COPY docker-* ejbca-wrapper /sbin/
 RUN docker-microdnf hostname shadow-utils unzip util-linux wget
 
 # Configure: bash profile
@@ -35,16 +35,20 @@ RUN sed --in-place --expression="/^HISTSIZE/s/1000/9999/" --expression="/^HISTFI
 RUN mkdir --mode=0755 --parents /etc/entrypoint.d/ /etc/healthcheck.d/
 COPY entrypoint.ejbca /etc/entrypoint.d/ejbca
 
-ENV EJBCA_DATA=/mnt/persistent EJBCA_HOME=/opt/keyfactor/ejbca JBOSS_HOME=/opt/keyfactor/wildfly-26.1.2.Final
+ENV EJBCA_DATA=/mnt/external EJBCA_HOME=/opt/keyfactor/ejbca JBOSS_HOME=/opt/keyfactor/wildfly-26.1.2.Final
 RUN mkdir --parents ${EJBCA_DATA} && \
 	wget --quiet --output-document=/tmp/ZuluJCEPolicies.zip https://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip && \
 	unzip -oj /tmp/ZuluJCEPolicies.zip ZuluJCEPolicies/local_policy.jar ZuluJCEPolicies/US_export_policy.jar -d /usr/lib/jvm/java-11-slim/lib/security/ && \
 	rm --force /tmp/ZuluJCEPolicies.zip
 
+# Configure: healthcheck
+COPY healthcheck.java /etc/healthcheck.d/java
+
+HEALTHCHECK CMD /sbin/healthcheck
+
 # Configure: ejbca
-ENV EP_USER=ejbca
-RUN useradd --gid=0 --groups=tty --home=/opt --comment="ejbca user" --uid=10001 ${EP_USER}
+RUN useradd --gid=0 --groups=tty --home=/opt --comment="ejbca user" --uid=10001 ejbca
 COPY ejbca-renew-* /usr/local/bin/
 
 ENTRYPOINT ["/sbin/entrypoint"]
-CMD ["/opt/keyfactor/bin/start.sh"]
+CMD ["/sbin/ejbca-wrapper"]

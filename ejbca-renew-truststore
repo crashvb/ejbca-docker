@@ -5,16 +5,11 @@ set -e -o pipefail
 source /usr/local/lib/entrypoint.sh
 
 secrets="${EP_SECRETS_ROOT}/ejbca_truststore_password"
-if [[ ! -e "${secrets}" ]] ; then
+if [[ -e "${secrets}" ]] ; then
 	generate_password ejbca_truststore
 else
-	read -p "ejbca truststore password not found, please provide:" -r -s EJBCA_TRUSTSTORE_PASSWORD
+	read -p "EJBCA truststore password not found, please provide:" -r -s EJBCA_TRUSTSTORE_PASSWORD
 	echo ""
-fi
-
-EJBCA_CA_NAME="${1}"
-if [[ -z "${EJBCA_CA_NAME}" ]] ; then
-	read -p "What is the name of the CA?: " -r EJBCA_CA_NAME
 fi
 
 if [[ -z "${EJBCA_TRUSTSTORE_PASSWORD}" ]] ; then
@@ -22,16 +17,23 @@ if [[ -z "${EJBCA_TRUSTSTORE_PASSWORD}" ]] ; then
 	exit 1
 fi
 
-tmp="$(mktemp --dry-run)"
 truststore="${EJBCA_DATA}/p12/truststore.jks"
-su --command="cd \"${EJBCA_DATA}\" && \"${EJBCA_HOME}/bin/ejbca.sh\" ca getcacert --caname=\"${EJBCA_CA_NAME}\" -f \"${tmp}\"" --login ejbca
-rm "${truststore}"
-keytool -importcert -noprompt -alias trusted-ca -file "${tmp}" -keystore "${truststore}" -storepass "${EJBCA_TRUSTSTORE_PASSWORD}"
-rm "${tmp}"
+[[ -e "${truststore}" ]] && mv "${truststore}" "${truststore}.old"
 
-chown jboss:jboss "${truststore}"
+su --command="cd \"${EJBCA_DATA}\" && \"${EJBCA_HOME}/bin/ejbca.sh\" ca createtruststore --format JKS --password \"${EJBCA_TRUSTSTORE_PASSWORD}\" --truststore \"${truststore}\"" ejbca
+chmod 0644 "${truststore}"
+chown ejbca:root "${truststore}"
+
+# Deploy to running instance (doesn't always work) ...
 install --group root --mode 0644 --owner ejbca "${truststore}" "${JBOSS_HOME}/standalone/configuration/truststore.jks"
-ls -l "${truststore}" "${JBOSS_HOME}/standalone/configuration/truststore.jks"
+
+# Deploy to location that /opt/keyfactor/bin/internal/after-deployed.sh uses ...
+install --group root --mode 0644 --owner ejbca "${truststore}" "${EJBCA_DATA}/secrets/tls/ts/truststore.jks"
+install --group root --mode 0640 --owner ejbca /dev/null "${EJBCA_DATA}/secrets/tls/ts/truststore.storepasswd"
+echo "${EJBCA_TRUSTSTORE_PASSWORD}" > "${EJBCA_DATA}/secrets/tls/ts/truststore.storepasswd"
+
+ls -l "${truststore}" "${JBOSS_HOME}/standalone/configuration/truststore.jks" "${EJBCA_DATA}/secrets/tls/ts/truststore."*
+keytool -list -keystore "${EJBCA_DATA}/secrets/tls/ts/truststore.jks" -storepass "${EJBCA_TRUSTSTORE_PASSWORD}" -storetype JKS
 
 echo "*** JBoss must be restared to apply the changes! ***"
 

@@ -57,26 +57,8 @@ The embedded entrypoint script is located at `/etc/entrypoint.d/20ejbca` and per
  | Variable | Default Value | Description |
  | ---------| ------------- | ----------- |
  | EJBCA\_ADMIN\_PASSWORD | _random_ | The ejbca `admin` password. |
- | EJBCA\_CA\_NAME | ManagementCA | The name of the CA. |
- | EJBCA\_CA\_DN | CN=$EJBCA\_CA\_NAME,O=EJBCA Sample,C=SE | The distinguished name of the CA. |
- | EJBCA\_CA\_KEY\_SPEC | 4096 | The cryptographic key length. |
- | EJBCA\_CA\_KEY\_TYPE | RSA | The cryptography algorithm. |
- | EJBCA\_CA\_POLICY\_ID | null |  |
- | EJBCA\_CA\_SIGNATURE\_ALGORITHM | SHA256WithRSA | The signature algorithm. |
- | EJBCA\_CA\_TOKEN\_PASSWORD | null |  |
- | EJBCA\_CA\_VALIDITY\_DAYS | 30 | The time, in days, for which the CA is valid. |
- | EJBCA\_DATABASE\_HOST | ejbca-db | The ejbca database hostname. (mysql only) |
- | EJBCA\_DATABASE\_NAME | ejbca | The ejbca database name. (mysql only) |
  | EJBCA\_DATABASE\_PASSWORD | _random_ | The ejbca `database` password. |
- | EJBCA\_DATABASE\_PORT | 3306 | The ejbca database port. (mysql only) |
- | EJBCA\_DATABASE\_USERNAME | ejbca | The ejbca database username. (mysql only) |
- | EJBCA\_DATASOURCE | h2 | The datasource type (h2, postgres, mariadb, etc ...) |
  | EJBCA\_KEYSTORE\_PASSWORD | _random_ | The ejbca `keystore` password. |
- | EJBCA\_SERVER\_NAME | localhost | The name of the server. |
- | EJBCA\_SERVER\_DN | CN=$EJBCA\_SERVER\_NAME,O=EJBCA Sample,C=SE | The distinguished name of the server. |
- | EJBCA\_SUPERADMIN\_CN | SuperAdmin | The common name of the administrator. |
- | EJBCA\_SUPERADMIN\_DN | CN=$EJBCA\_SUPERADMIN\_CN | The distinguised name of the administrator.  |
- | EJBCA\_SUPERADMIN\_KEYSTORE\_BATCHED | true |  |
  | EJBCA\_TRUSTSTORE\_PASSWORD | _random_ | The ejbca `truststore` password. |
 
 ## Standard Configuration
@@ -88,35 +70,45 @@ The embedded entrypoint script is located at `/etc/entrypoint.d/20ejbca` and per
 ├─ etc/
 │  └─ entrypoint.d/
 │     └─ ejbca
-├─ run/
-│  └─ secrets/
-│     ├─ ejbca_admin_password
-│     ├─ ejbca_database_password
-│     ├─ ejbca_keystore_password
-│     └─ ejbca_truststore_password
-├─ usr/
-│  └─ share/
-│     └─ ejbca/
-└─ var/
-   └─ lib/
-      └─ ejbca/
-         └─ p12/
-            └─ superadmin.p12
+├─ mnt/
+│  ├─ external/
+│  │  ├─ p12/
+│  │  └─ secrets/
+│  │     └─ tls/
+│  │        ├─ ks/
+│  │        │  ├─ server.jks
+│  │        │  └─ server.storepasswd
+│  │        └─ ts/
+│  │           ├─ truststore.jks
+│  │           └─ truststore.storepasswd
+│  └─ persistent/
+├─ opt/
+│  └─ keyfactor/
+│     ├─ ejbca/
+│     └─ wildfly-x.y.z.Final/
+│        └─ standalone/
+│           └─ configuration/
+└─ run/
+   └─ secrets/
+      ├─ ejbca_admin_password
+      ├─ ejbca_database_password
+      ├─ ejbca_keystore_password
+      └─ ejbca_truststore_password
 ```
 
 ### Exposed Ports
 
-* `8080/tcp` - (_repurposed_) Public HTTP port of your application server, used for clients to access the public web for information. Not to be used for enrollment since it's not encrypted.
+* `8009/tcp` - Apache JServ Protocol. Used for HTTP clustering and load balancing.
+* `8080/tcp` - Public HTTP port of your application server, used for clients to access the public web for information. Not to be used for enrollment since it's not encrypted.
+* `8081/tcp` - HTTP back-end proxy port.
+* `8082/tcp` - HTTP back-end proxy port with client certificate headers.
 * `8442/tcp` - Public HTTPS port (server side only SSL) of your application server, used for clients to access the public web for enrollment.
 * `8443/tcp` - SSL protected HTTPS port used to access the EJBCA Admin GUI. This port requires client certificate for access.
 
 ### Volumes
 
-* `/var/lib/ejbca` - EJBCA data directory.
-
-## See Also
-
-* https://wiki.majic.rs/FreeSoftwareX509Cookbook/x509_infrastructure/certification_authority/setting-up_ejbca_as_certification_authority/#wiki-toc-preparing-ejbca-installation-files
+* `/mnt/external` - EJBCA data directory (static).
+* `/mnt/persistent` - EJBCA data directory (dynamic).
 
 ## Development
 

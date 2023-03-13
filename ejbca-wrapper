@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+exec /bin/su --command="/opt/keyfactor/bin/start.sh" "ejbca"
+

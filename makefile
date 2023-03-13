@@ -3,19 +3,12 @@
 include makefile.config
 -include makefile.config.local
 
-.PHONY: admin-web build clean debug default diff get-cert logs remove run shell start status stop test-code
+.PHONY: build debug default diff logs remove run shell start status stop test-code
 
 default: build
 
 build: Dockerfile
 	docker build --force-rm=true --tag=$(registry)$(namespace)/$(image):$(tag) $(buildargs) $(ARGS) .
-
-clean:
-	@rm --force ./superadmin.p12
-
-admin-web:
-	$(eval port := $(shell docker inspect --format='{{(index (index .NetworkSettings.Ports "8443/tcp") 0).HostPort}}' $(name)))
-	sensible-browser "https://localhost:$(port)/ejbca/adminweb/"
 
 debug:
 	docker run \
@@ -38,10 +31,6 @@ debug:
 
 diff:
 	@docker diff $(name)
-
-get-cert:
-	docker cp $(name):/mnt/persistent/p12/superadmin.p12 ./
-	docker exec $(name) cat /run/secrets/ejbca_admin_password
 
 logs:
 	@docker logs --follow=true $(ARGS) $(name)
